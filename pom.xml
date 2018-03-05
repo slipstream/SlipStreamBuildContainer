@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.sixsq.slipstream</groupId>
+  <artifactId>build-container</artifactId>
+  <version>1.1.0</version>
+  <name>build-container</name>
+  <packaging>pom</packaging>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>0.24.0</version>
+        <configuration>
+          <images>
+            <image>
+              <alias>build-container</alias>
+              <name>sixsq/slipstream:build-${project.version}</name>
+              <build>
+                <from>centos:7</from>
+                <optimise>true</optimise>
+                <runCmds>
+                  <!-- create user -->
+                  <runCmd>/usr/sbin/groupadd -r builder</runCmd>
+                  <runCmd>/usr/sbin/useradd -r -d /home/builder -g builder builder</runCmd>
+
+                  <!-- install all necessary OS packages -->
+                  <runCmd>yum clean all</runCmd>
+                  <runCmd>yum install -y yum-utils epel-release</runCmd>
+                  <runCmd>yum-config-manager --enable epel</runCmd>
+                  <runCmd>yum install -y git java-1.8.0-openjdk-devel python python-devel python-pip rpm-build createrepo gcc docker which</runCmd>
+
+                  <!-- install python packages -->
+                  <runCmd>pip install --upgrade pip</runCmd>
+                  <runCmd>pip install tox</runCmd>
+
+                  <!-- install pyenv -->
+                  <runCmd>curl -L -O https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer</runCmd>
+                  <runCmd>chmod a+x pyenv-installer</runCmd>
+                  <runCmd>./pyenv-installer</runCmd>
+                  <runCmd>touch /home/builder/.bash_profile</runCmd>
+                  <runCmd>dd if=/dev/zero count=1 bs=1 of=/home/builder/.bash_profile</runCmd>
+                  <runCmd>sed -i '$ a\export PATH="/root/.pyenv/bin:$PATH"' /home/builder/.bash_profile</runCmd>
+                  <runCmd>sed -i '$ a\eval "$(pyenv init -)"' /home/builder/.bash_profile</runCmd>
+                  <runCmd>sed -i '$ a\eval "$(pyenv virtualenv-init -)"' /home/builder/.bash_profile</runCmd>
+                  <runCmd>sed -i '1 d' /home/builder/.bash_profile</runCmd>
+
+                  <!-- install leiningen -->
+                  <runCmd>curl -L -o /usr/local/bin/lein https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein</runCmd>
+                  <runCmd>chmod a+x /usr/local/bin/lein</runCmd>
+                  <runCmd>lein -v</runCmd>
+
+                  <!-- install maven -->
+                  <runCmd>curl -L -O http://www-eu.apache.org/dist/maven/maven-3/3.5.2/binaries/apache-maven-3.5.2-bin.tar.gz</runCmd>
+                  <runCmd>tar zxf apache-maven-3.5.2-bin.tar.gz</runCmd>
+                  <runCmd>ln -s /home/builder/apache-maven-3.5.2/bin/mvn /usr/local/bin/mvn</runCmd>
+
+                  <!-- set owner to builder -->
+                  <runCmd>chown -R builder:builder /home/builder</runCmd>
+
+                  <!-- clear cache and history -->
+                  <runCmd>yum clean all</runCmd>
+                  <runCmd>history -c</runCmd>
+                  <runCmd>history -w</runCmd>
+                </runCmds>
+                <env>
+                  <SLIPSTREAM_RING_CONTAINER_INIT>sixsq.slipstream.server.ring-example/init</SLIPSTREAM_RING_CONTAINER_INIT>
+                </env>
+                <workdir>/home/builder</workdir>
+                <user>builder</user>
+                <compression>bzip2</compression>
+                <tags>build</tags>
+              </build>
+            </image>
+          </images>
+        </configuration>
+        <executions>
+          <execution>
+            <id>docker-build</id>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
