@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sixsq.slipstream</groupId>
   <artifactId>build-container</artifactId>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
   <name>build-container</name>
   <packaging>pom</packaging>
   <build>
@@ -23,10 +23,6 @@
                 <from>centos:7</from>
                 <optimise>true</optimise>
                 <runCmds>
-                  <!-- create user -->
-                  <runCmd>/usr/sbin/groupadd -r builder</runCmd>
-                  <runCmd>/usr/sbin/useradd -r -d /home/builder -g builder builder</runCmd>
-
                   <!-- install all necessary OS packages -->
                   <runCmd>yum clean all</runCmd>
                   <runCmd>yum install -y yum-utils epel-release</runCmd>
@@ -35,19 +31,24 @@
 
                   <!-- install python packages -->
                   <runCmd>pip install --upgrade pip</runCmd>
-                  <runCmd>pip install nose</runCmd>
                   <runCmd>pip install tox</runCmd>
 
                   <!-- install pyenv -->
-                  <runCmd>curl -L -O https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer</runCmd>
-                  <runCmd>chmod a+x pyenv-installer</runCmd>
-                  <runCmd>./pyenv-installer</runCmd>
-                  <runCmd>touch /home/builder/.bash_profile</runCmd>
-                  <runCmd>dd if=/dev/zero count=1 bs=1 of=/home/builder/.bash_profile</runCmd>
-                  <runCmd>sed -i '$ a\export PATH="/root/.pyenv/bin:$PATH"' /home/builder/.bash_profile</runCmd>
-                  <runCmd>sed -i '$ a\eval "$(pyenv init -)"' /home/builder/.bash_profile</runCmd>
-                  <runCmd>sed -i '$ a\eval "$(pyenv virtualenv-init -)"' /home/builder/.bash_profile</runCmd>
-                  <runCmd>sed -i '1 d' /home/builder/.bash_profile</runCmd>
+                  <runCmd>mkdir -p /root/.pyenv</runCmd>
+                  <runCmd>git clone https://github.com/pyenv/pyenv.git /root/.pyenv</runCmd>
+                  <runCmd>mkdir -p /root/.pyenv/plugins</runCmd>
+                  <runCmd>git clone https://github.com/pyenv/pyenv-doctor.git /root/.pyenv/plugins/pyenv-doctor</runCmd>
+                  <runCmd>git clone https://github.com/pyenv/pyenv-installer.git /root/.pyenv/plugins/pyenv-installer</runCmd>
+                  <runCmd>git clone https://github.com/pyenv/pyenv-update.git /root/.pyenv/plugins/pyenv-update</runCmd>
+                  <runCmd>git clone https://github.com/pyenv/pyenv-virtualenv.git /root/.pyenv/plugins/pyenv-virtualenv</runCmd>
+                  <runCmd>git clone https://github.com/pyenv/pyenv-which-ext.git /root/.pyenv/plugins/pyenv-which-ext</runCmd>
+
+                  <!-- configure startup script -->
+                  <runCmd>sed -i '$ a\export PS1="\\W\\\\\$ "' /root/.bash_profile</runCmd>
+                  <runCmd>sed -i '$ a\export LEIN_ROOT=true' /root/.bash_profile</runCmd>
+                  <runCmd>sed -i '$ a\export PATH="/root/.pyenv/bin:$PATH"' /root/.bash_profile</runCmd>
+                  <runCmd>sed -i '$ a\eval "$(pyenv init -)"' /root/.bash_profile</runCmd>
+                  <runCmd>sed -i '$ a\eval "$(pyenv virtualenv-init -)"' /root/.bash_profile</runCmd>
 
                   <!-- install leiningen -->
                   <runCmd>curl -L -o /usr/local/bin/lein https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein</runCmd>
@@ -57,21 +58,21 @@
                   <!-- install maven -->
                   <runCmd>curl -L -O http://www-eu.apache.org/dist/maven/maven-3/3.5.2/binaries/apache-maven-3.5.2-bin.tar.gz</runCmd>
                   <runCmd>tar zxf apache-maven-3.5.2-bin.tar.gz</runCmd>
-                  <runCmd>ln -s /home/builder/apache-maven-3.5.2/bin/mvn /usr/local/bin/mvn</runCmd>
-
-                  <!-- set owner to builder -->
-                  <runCmd>chown -R builder:builder /home/builder</runCmd>
-
+                  <runCmd>rm -f apache-maven-3.5.2-bin.tar.gz</runCmd>
+                  <runCmd>mv apache-maven-3.5.2 .apache-maven</runCmd>
+                  <runCmd>ln -s /root/.apache-maven/bin/mvn /usr/local/bin/mvn</runCmd>
+                  <runCmd>rm -f anaconda-ks.cfg</runCmd>
+                  
                   <!-- clear cache and history -->
                   <runCmd>yum clean all</runCmd>
                   <runCmd>history -c</runCmd>
                   <runCmd>history -w</runCmd>
                 </runCmds>
-                <env>
-                  <SLIPSTREAM_RING_CONTAINER_INIT>sixsq.slipstream.server.ring-example/init</SLIPSTREAM_RING_CONTAINER_INIT>
-                </env>
-                <workdir>/home/builder</workdir>
-                <user>builder</user>
+                <entryPoint>
+                  <shell>/bin/bash -l</shell>
+                </entryPoint>
+                <workdir>/root</workdir>
+                <user>root</user>
                 <compression>bzip2</compression>
                 <tags>build</tags>
               </build>
