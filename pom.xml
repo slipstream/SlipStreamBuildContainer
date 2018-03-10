@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sixsq.slipstream</groupId>
   <artifactId>build-container</artifactId>
-  <version>1.3.0</version>
+  <version>1.4.0</version>
   <name>build-container</name>
   <packaging>pom</packaging>
   <build>
@@ -32,6 +32,11 @@
                   <!-- install python packages -->
                   <runCmd>pip install --upgrade pip</runCmd>
                   <runCmd>pip install tox</runCmd>
+
+                  <!-- required for connector builds -->
+                  <runCmd>pip install nose</runCmd>
+                  <runCmd>pip install coverage</runCmd>
+                  <runCmd>pip install pycrypto</runCmd>
 
                   <!-- install pyenv -->
                   <runCmd>mkdir -p /root/.pyenv</runCmd>
