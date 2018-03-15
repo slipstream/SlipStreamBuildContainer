@@ -5,7 +5,7 @@ SlipStream builds.  It contains all of the [external dependencies and
 tools](http://ssdocs.sixsq.com/en/latest/developer_guide/dependencies.html)
 required to build SlipStream.
 
-## Running Container
+## Running
 
 The published container can be run with the command:
 
@@ -28,7 +28,7 @@ the container.  You can have multiple `-v` options; other interesting
 directories to share are your git workspaces and the local maven cache
 `~/.m2`.
 
-## Building Container
+## Building
 
 The build process uses maven and a Docker maven plugin to create the
 container.  Just do the usual maven dance:
@@ -57,7 +57,7 @@ versioned image "build-1.6.0-SNAPSHOT".  Note that these are
 identical; Docker keeps only a single copy of the image under the
 hood.
 
-## Publishing Container
+## Publishing
 
 To publish the container, you must have an account on [Docker
 Cloud](https://cloud.docker.com) and have been invited to the "sixsq"
