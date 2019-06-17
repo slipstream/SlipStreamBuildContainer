@@ -27,7 +27,7 @@
                   <runCmd>yum clean all</runCmd>
                   <runCmd>yum install -y yum-utils epel-release</runCmd>
                   <runCmd>yum-config-manager --enable epel</runCmd>
-                  <runCmd>yum install -y git java-1.8.0-openjdk-devel python python-devel python-pip rpm-build createrepo gcc docker which</runCmd>
+                  <runCmd>yum install -y git java-1.8.0-openjdk-devel python python-devel python-pip rpm-build createrepo gcc docker which npm</runCmd>
 
                   <!-- install python packages -->
                   <runCmd>pip install --upgrade pip</runCmd>
