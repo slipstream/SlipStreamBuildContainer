@@ -63,10 +63,10 @@
                   <runCmd>lein -v</runCmd>
 
                   <!-- install maven -->
-                  <runCmd>curl -L -O http://www-eu.apache.org/dist/maven/maven-3/3.5.2/binaries/apache-maven-3.5.2-bin.tar.gz</runCmd>
-                  <runCmd>tar zxf apache-maven-3.5.2-bin.tar.gz</runCmd>
-                  <runCmd>rm -f apache-maven-3.5.2-bin.tar.gz</runCmd>
-                  <runCmd>mv apache-maven-3.5.2 .apache-maven</runCmd>
+                  <runCmd>curl -L -O https://www-eu.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz</runCmd>
+                  <runCmd>tar zxf apache-maven-3.6.1-bin.tar.gz</runCmd>
+                  <runCmd>rm -f apache-maven-3.6.1-bin.tar.gz</runCmd>
+                  <runCmd>mv apache-maven-3.6.1 .apache-maven</runCmd>
                   <runCmd>ln -s /root/.apache-maven/bin/mvn /usr/local/bin/mvn</runCmd>
                   <runCmd>rm -f anaconda-ks.cfg</runCmd>
                   
