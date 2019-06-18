@@ -31,7 +31,7 @@
 
                   <!-- install python packages -->
                   <runCmd>pip install --upgrade pip</runCmd>
-                  <runCmd>pip install tox</runCmd>
+                  <runCmd>pip install tox==2.9.1</runCmd>
 
                   <!-- required for connector builds -->
                   <!--
